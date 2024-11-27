@@ -19,21 +19,19 @@ jobs:
   lint:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/astral-sh/uv:latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - name: Set up UV
+        run: wget -qO- https://astral.sh/uv/install.sh | sh
 
-      # Runs a set of commands using the runners shell
+      - uses: actions/checkout@v4
 
       - name: Run a multi-line script
         run: |
-          sync
-          run ruff check
-          run ruff format --check
-          run bandit -r src
-          run vulture src
-          run mypy src
+          uv sync
+          uv run ruff check
+          uv run ruff format --check
+          uv run bandit -r src
+          uv run vulture src
+          uv run mypy src
