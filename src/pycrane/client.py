@@ -1,7 +1,5 @@
 """Wrapper for the registry API."""
 
-from typing import Optional
-
 from requests.auth import AuthBase, HTTPBasicAuth
 
 from pycrane import utils
@@ -12,10 +10,10 @@ class Pycrane:
 
     def __init__(
         self,
-        url: Optional[str] = None,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
-        authfile: Optional[str] = None,
+        url: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
+        authfile: str | None = None,
         api_version: str = "2",
     ) -> None:
         self.url = url
@@ -36,7 +34,7 @@ class Pycrane:
             raise ValueError(
                 "Only one of authfile or username should be defined"
             )
-        self._auth: Optional[AuthBase] = None
+        self._auth: AuthBase | None = None
         if self.username and self.password:
             self._auth = HTTPBasicAuth(self.username, self.password)
 
