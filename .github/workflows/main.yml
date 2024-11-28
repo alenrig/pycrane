@@ -23,8 +23,11 @@ jobs:
       - name: ruff check
         run: uv run ruff check
 
-      - name: ruff format
+      - name: ruff format check
         run: uv run ruff format --check
+
+      - name: pylint
+        run: uv run pylint src
 
       - name: bandit
         run: uv run bandit -r src
