@@ -1,9 +1,10 @@
 """Wrapper for the registry API."""
 
-from typing import Any, Optional
+from typing import Optional
 
-from requests import Response
 from requests.auth import AuthBase, HTTPBasicAuth
+
+from pycrane import utils
 
 
 class Pycrane:
@@ -15,11 +16,15 @@ class Pycrane:
         username: Optional[str] = None,
         password: Optional[str] = None,
         authfile: Optional[str] = None,
+        api_version: str = "2",
     ) -> None:
         self.url = url
         self.username = username
         self.password = password
         self.authfile = authfile
+        self._base_url = utils.get_base_url(url)
+        self._api_version = api_version
+        self._url = f"{self._base_url}/api/v{api_version}"
         self._set_auth_info()
 
     def _set_auth_info(self) -> None:
@@ -35,30 +40,7 @@ class Pycrane:
         if self.username and self.password:
             self._auth = HTTPBasicAuth(self.username, self.password)
 
-    def http_get(
-        self, path: str, query_data: Optional[dict[str, Any]] = None
-    ) -> Response:
-        """Make a GET request to the Docker Registry server.
-
-        Args:
-            path (str): path to query.
-            query_data (Optional[dict[str, Any]], optional): data to send
-                as query parameters. Defaults to None.
-
-        Returns:
-            Response: request result
-        """
-
-    def http_post(
-        self, path: str, query_data: Optional[dict[str, Any]] = None
-    ) -> Response:
-        """Make a POST request to the Docker Registry server.
-
-        Args:
-            path (str): path to query.
-            query_data (Optional[dict[str, Any]], optional): data to send
-                as query parameters. Defaults to None.
-
-        Returns:
-            Response: _description_
-        """
+    def _build_url(self, path: str) -> str:
+        if path.startswith("http://") or path.startswith("https://"):
+            return path
+        return f"{self._url}/{path}"
