@@ -37,3 +37,17 @@ jobs:
 
       - name: mypy
         run: uv run mypy src
+
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up UV
+        run: wget -qO- https://astral.sh/uv/install.sh | sh
+
+      - uses: actions/checkout@v4
+
+      - name: sync
+        run: uv sync
+
+      - name: pytest
+        run: uv run pytest
