@@ -5,7 +5,7 @@ description = "Library for working with docker images."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "requests>=2.32.3",
+    "httpx>=0.28.0",
 ]
 
 [build-system]
