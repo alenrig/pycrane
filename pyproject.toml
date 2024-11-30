@@ -20,7 +20,11 @@ dev-dependencies = [
     "vulture>=2.13",
     "pylint>=3.3.1",
     "types-requests>=2.32.0.20241016",
+    "pycrane",
 ]
+
+[tool.uv.sources]
+pycrane = { workspace = true }
 
 [tool.ruff]
 cache-dir = ".cache/ruff"
