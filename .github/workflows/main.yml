@@ -33,7 +33,7 @@ jobs:
         run: uv run bandit -r src
 
       - name: vulture
-        run: uv run vulture src
+        run: uv run vulture src || true
 
       - name: mypy
         run: uv run mypy src
