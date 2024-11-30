@@ -42,3 +42,18 @@ class Pycrane:
             self._auth = get_authfile_credentials(
                 self.authfile, self._base_url
             )
+
+    def inspect(self, image: str) -> str:
+        """Get image metadata.
+
+        Args:
+            image (str): image to inpect.
+
+        Returns:
+            str: result
+        """
+        return image
+
+    def mock(self) -> None:
+        """Mock method
+        """
