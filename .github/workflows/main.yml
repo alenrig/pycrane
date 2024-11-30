@@ -12,8 +12,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up UV
-        run: wget -qO- https://astral.sh/uv/install.sh | sh
+      - name: install uv
+        uses: astral-sh/setup-uv@v4
 
       - uses: actions/checkout@v4
 
@@ -41,8 +41,8 @@ jobs:
   unit-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up UV
-        run: wget -qO- https://astral.sh/uv/install.sh | sh
+      - name: install uv
+        uses: astral-sh/setup-uv@v4
 
       - uses: actions/checkout@v4
 
