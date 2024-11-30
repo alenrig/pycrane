@@ -55,5 +55,4 @@ class Pycrane:
         return image
 
     def mock(self) -> None:
-        """Mock method
-        """
+        """Mock method"""
