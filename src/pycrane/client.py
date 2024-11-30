@@ -2,8 +2,6 @@
 
 from requests.auth import AuthBase, HTTPBasicAuth
 
-from pycrane import utils
-
 
 class Pycrane:
     """Represents a Registry server connection."""
@@ -14,15 +12,11 @@ class Pycrane:
         username: str | None = None,
         password: str | None = None,
         authfile: str | None = None,
-        api_version: str = "2",
     ) -> None:
         self.url = url
         self.username = username
         self.password = password
         self.authfile = authfile
-        self._base_url = utils.get_base_url(url)
-        self._api_version = api_version
-        self._url = f"{self._base_url}/api/v{api_version}"
         self._set_auth_info()
 
     def _set_auth_info(self) -> None:
@@ -37,8 +31,5 @@ class Pycrane:
         self._auth: AuthBase | None = None
         if self.username and self.password:
             self._auth = HTTPBasicAuth(self.username, self.password)
-
-    def _build_url(self, path: str) -> str:
-        if path.startswith("http://") or path.startswith("https://"):
-            return path
-        return f"{self._url}/{path}"
+            return
+        # TODO: add auth through authfile
