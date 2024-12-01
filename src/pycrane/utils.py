@@ -2,25 +2,23 @@
 
 import json
 from pathlib import Path
+from urllib.parse import urlparse
 
 from requests.auth import HTTPBasicAuth
 
-from pycrane import const
 
-
-def get_base_url(url: str | None = None) -> str:
-    """Returns the base url with the trailing slash stripped.
-    If the URL is not provided, the default URL is returned.
+def get_netloc(url: str) -> str:
+    """Get url network location.
 
     Args:
-        url (str | None, optional): url to strip. Defaults to None.
+        url (str): url to parse.
 
     Returns:
-        str: the base url
+        str: network location. Example docker.io for https://docker.io/path.
     """
-    if url:
-        return url.rstrip("/")
-    return const.DEFAULT_URL
+    if not url.startswith('http'):
+        url = '//' + url
+    return urlparse(url).netloc
 
 
 def get_authfile_credentials(authfile: Path, base_url: str) -> HTTPBasicAuth:
