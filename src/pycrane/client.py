@@ -5,7 +5,7 @@ from pathlib import Path
 import www_authenticate
 from requests.auth import AuthBase, HTTPBasicAuth
 
-from pycrane.backend import HTTPBackend
+from pycrane.backend import BearerAuth, HTTPBackend
 from pycrane.utils import get_authfile_credentials, get_netloc
 
 
@@ -24,7 +24,6 @@ class Pycrane:
         self.password = password
         self.authfile = authfile
         self.api_version = 2
-        self._backend = HTTPBackend(url=self._base_url, auth=self._auth)
 
     @property
     def _base_url(self) -> str:
@@ -52,13 +51,18 @@ class Pycrane:
             )
         return HTTPBasicAuth(str(self.username), str(self.password))
 
-    def get_token(self) -> str | None:
-        """Get registry JWT token.
+    @property
+    def _authenticator(self) -> HTTPBackend:
+        return HTTPBackend(url=self._base_url, auth=self._auth)
 
-        Returns:
-            str | None: token on successful auth.
-        """
-        response = self._backend.http_get(url=self._url)
+    @property
+    def _backend(self) -> HTTPBackend:
+        return HTTPBackend(
+            url=self._base_url, auth=BearerAuth(token=self._get_token())
+        )
+
+    def _get_token(self) -> str | None:
+        response = self._authenticator.http_get(url=self._url)
         auth_headers = www_authenticate.parse(
             response.headers["WWW-Authenticate"]
         )
@@ -66,7 +70,7 @@ class Pycrane:
         realm = bearer.get("realm", "")
         service = bearer.get("service", "")
         auth_url = f"{realm}?service={service}&client_id=pycrane"
-        response = self._backend.http_get(url=auth_url)
+        response = self._authenticator.http_get(url=auth_url)
         content = response.json()
         if isinstance(content, dict):
             return content.get("token")

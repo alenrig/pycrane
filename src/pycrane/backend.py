@@ -4,6 +4,15 @@ from requests import Response, Session
 from requests.auth import AuthBase
 
 
+class BearerAuth(AuthBase):
+    def __init__(self, token: str):
+        self._token = token
+
+    def __call__(self, r):
+        r.headers["authorization"] = "Bearer " + self._token
+        return r
+
+
 class HTTPBackend:
     """Class for http calls."""
 
