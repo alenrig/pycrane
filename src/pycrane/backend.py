@@ -1,7 +1,6 @@
 """HTTP Backend module for http calls."""
 
-import www_authenticate
-from requests import Session
+from requests import Response, Session
 from requests.auth import AuthBase
 
 
@@ -19,18 +18,24 @@ class HTTPBackend:
             session.auth = self._auth
         return session
 
-    def _get_token(self) -> str | None:
-        url = "https://registry-1.docker.io/v2"
-        response = self._session.get(url=url)
-        auth_headers = www_authenticate.parse(
-            response.headers["WWW-Authenticate"]
-        )
-        bearer: dict[str, str] = auth_headers.get("bearer", {})
-        realm = bearer.get("realm", "")
-        service = bearer.get("service", "")
-        auth_url = f"{realm}?service={service}&client_id=pycrane"
-        response = self._session.get(url=auth_url)
-        content = response.json()
-        if isinstance(content, dict):
-            return content.get("token")
-        return None
+    def http_get(self, url: str) -> Response:
+        """Make GET HTTP request.
+
+        Args:
+            url (str): path for request.
+
+        Returns:
+            Response: result of request.
+        """
+        return self._session.request(method="get", url=url)
+
+    def http_post(self, url: str) -> Response:
+        """Make POST HTTP request.
+
+        Args:
+            url (str): path for request.
+
+        Returns:
+            Response: result of request.
+        """
+        return self._session.request(method="post", url=url)

@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import www_authenticate
 from requests.auth import AuthBase, HTTPBasicAuth
 
 from pycrane.backend import HTTPBackend
@@ -45,8 +46,34 @@ class Pycrane:
                 self.authfile, self._base_url
             )
 
-    def get_token(self) -> str:
-        return "token"
+    def get_token(self) -> str | None:
+        """Get registry JWT token.
+
+        Returns:
+            str | None: token on successful auth.
+        """
+        url = "https://registry-1.docker.io/v2"
+        response = self._backend.http_get(url=url)
+        auth_headers = www_authenticate.parse(
+            response.headers["WWW-Authenticate"]
+        )
+        bearer: dict[str, str] = auth_headers.get("bearer", {})
+        realm = bearer.get("realm", "")
+        service = bearer.get("service", "")
+        auth_url = f"{realm}?service={service}&client_id=pycrane"
+        response = self._backend.http_get(url=auth_url)
+        content = response.json()
+        if isinstance(content, dict):
+            return content.get("token")
+        return None
 
     def inspect(self, image: str) -> str:
+        """Get image manifest.
+
+        Args:
+            image (str): full image path to inspect.
+
+        Returns:
+            str: image manifest if exists.
+        """
         return image
