@@ -53,6 +53,7 @@ def test_client_init(
 ):
     mocker.patch("pycrane.client.get_authfile_credentials")
     with expectation as e:
-        Pycrane(username=username, password=password, authfile=authfile)
+        p = Pycrane(username=username, password=password, authfile=authfile)
+        _ = p._auth
     if e:
         assert str(e.value) == error_msg
