@@ -14,7 +14,7 @@ class Pycrane:
 
     def __init__(
         self,
-        url: str | None = None,
+        url: str = "https://registry-1.docker.io/v2",
         username: str | None = None,
         password: str | None = None,
         authfile: Path | None = None,
@@ -52,8 +52,7 @@ class Pycrane:
         Returns:
             str | None: token on successful auth.
         """
-        url = "https://registry-1.docker.io/v2"
-        response = self._backend.http_get(url=url)
+        response = self._backend.http_get(url=self.url)
         auth_headers = www_authenticate.parse(
             response.headers["WWW-Authenticate"]
         )
