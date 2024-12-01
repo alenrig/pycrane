@@ -16,8 +16,8 @@ def get_netloc(url: str) -> str:
     Returns:
         str: network location. Example docker.io for https://docker.io/path.
     """
-    if not url.startswith('http'):
-        url = '//' + url
+    if not url.startswith("http"):
+        url = "//" + url
     return urlparse(url).netloc
 
 
