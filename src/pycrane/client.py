@@ -17,14 +17,13 @@ class Pycrane:
         url: str = "https://registry-1.docker.io/v2",
         username: str | None = None,
         password: str | None = None,
-        authfile: Path | None = None,
+        authfile: str | None = None,
     ) -> None:
         self.url = url
         self.username = username
         self.password = password
         self.authfile = authfile
         self.api_version = 2
-        self._set_auth_info()
         self._backend = HTTPBackend(url=self._base_url, auth=self._auth)
 
     @property
@@ -35,7 +34,8 @@ class Pycrane:
     def _url(self) -> str:
         return f"{self._base_url}/v{self.api_version}"
 
-    def _set_auth_info(self) -> None:
+    @property
+    def _auth(self) -> AuthBase:
         if not any([self.username, self.password, self.authfile]):
             raise ValueError("Specify auth method")
         if (self.username and not self.password) or (
@@ -46,13 +46,11 @@ class Pycrane:
             raise ValueError(
                 "Only one of authfile or username should be defined"
             )
-        self._auth: AuthBase | None = None
-        if self.username and self.password:
-            self._auth = HTTPBasicAuth(self.username, self.password)
         if self.authfile:
-            self._auth = get_authfile_credentials(
-                self.authfile, self._base_url
+            return get_authfile_credentials(
+                Path(self.authfile), self._base_url
             )
+        return HTTPBasicAuth(str(self.username), str(self.password))
 
     def get_token(self) -> str | None:
         """Get registry JWT token.
