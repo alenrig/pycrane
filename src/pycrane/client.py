@@ -4,6 +4,7 @@ from pathlib import Path
 
 from requests.auth import AuthBase, HTTPBasicAuth
 
+from pycrane.backend import HTTPBackend
 from pycrane.utils import get_authfile_credentials, get_base_url
 
 
@@ -23,6 +24,7 @@ class Pycrane:
         self.authfile = authfile
         self._set_auth_info()
         self._base_url = get_base_url(url)
+        self._backend = HTTPBackend()
 
     def _set_auth_info(self) -> None:
         if not any([self.username, self.password, self.authfile]):
@@ -42,6 +44,12 @@ class Pycrane:
             self._auth = get_authfile_credentials(
                 self.authfile, self._base_url
             )
+
+    def _get_session_opts(self) -> dict:
+        return {"auth": self._auth}
+
+    def _http_request(self):
+        pass
 
     def inspect(self, image: str) -> str:
         """Get image metadata.
