@@ -14,7 +14,7 @@ class Pycrane:
 
     def __init__(
         self,
-        url: str = "https://registry-1.docker.io/v2",
+        url: str = "registry-1.docker.io",
         username: str | None = None,
         password: str | None = None,
         authfile: str | None = None,

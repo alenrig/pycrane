@@ -50,8 +50,11 @@ from pycrane.client import Pycrane
         (None, None, "path", nullcontext(), ""),
     ],
 )
-def test_client_init(username, password, authfile, expectation, error_msg):
+def test_client_init(
+    mocker, username, password, authfile, expectation, error_msg
+):
     """Test client initialization."""
+    mocker.patch("pycrane.client.get_authfile_credentials")
     with expectation as e:
         Pycrane(username=username, password=password, authfile=authfile)
     if e:
