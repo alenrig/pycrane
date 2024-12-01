@@ -1,5 +1,3 @@
-"""Client testing module."""
-
 from contextlib import nullcontext
 
 import pytest
@@ -53,7 +51,6 @@ from pycrane.client import Pycrane
 def test_client_init(
     mocker, username, password, authfile, expectation, error_msg
 ):
-    """Test client initialization."""
     mocker.patch("pycrane.client.get_authfile_credentials")
     with expectation as e:
         Pycrane(username=username, password=password, authfile=authfile)

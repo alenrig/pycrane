@@ -1,4 +1,3 @@
-"""Utils Testing Module"""
 import pytest
 
 from pycrane import utils
@@ -18,5 +17,4 @@ from pycrane import utils
     ]
 )
 def test_get_base_url(url, expected):
-    """Test get_base_url"""
-    assert utils.get_base_url(url) == expected
+    assert utils.get_netloc(url) == expected
