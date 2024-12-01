@@ -2,14 +2,21 @@
 
 import www_authenticate
 from requests import Session
+from requests.auth import AuthBase
 
 
 class HTTPBackend:
     """Class for http calls."""
 
+    def __init__(self, url: str, auth: AuthBase | None = None) -> None:
+        self._url = url
+        self._auth = auth
+
     @property
     def _session(self) -> Session:
         session = Session()
+        if self._auth:
+            session.auth = self._auth
         return session
 
     def _get_token(self) -> str | None:

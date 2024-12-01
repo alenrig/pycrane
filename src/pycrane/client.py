@@ -24,7 +24,7 @@ class Pycrane:
         self.authfile = authfile
         self._set_auth_info()
         self._base_url = get_base_url(url)
-        self._backend = HTTPBackend()
+        self._backend = HTTPBackend(url=self._base_url, auth=self._auth)
 
     def _set_auth_info(self) -> None:
         if not any([self.username, self.password, self.authfile]):
@@ -45,22 +45,8 @@ class Pycrane:
                 self.authfile, self._base_url
             )
 
-    def _get_session_opts(self) -> dict:
-        return {"auth": self._auth}
-
-    def _http_request(self):
-        pass
+    def get_token(self) -> str:
+        return "token"
 
     def inspect(self, image: str) -> str:
-        """Get image metadata.
-
-        Args:
-            image (str): image to inpect.
-
-        Returns:
-            str: result
-        """
         return image
-
-    def mock(self) -> None:
-        """Mock method"""
