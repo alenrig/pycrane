@@ -23,9 +23,17 @@ class Pycrane:
         self.username = username
         self.password = password
         self.authfile = authfile
+        self.api_version = 2
         self._set_auth_info()
-        self._base_url = get_base_url(url)
         self._backend = HTTPBackend(url=self._base_url, auth=self._auth)
+
+    @property
+    def _base_url(self) -> str:
+        return get_base_url(self.url)
+
+    @property
+    def _url(self) -> str:
+        return f"{self._base_url}/v{self.api_version}"
 
     def _set_auth_info(self) -> None:
         if not any([self.username, self.password, self.authfile]):
@@ -52,7 +60,7 @@ class Pycrane:
         Returns:
             str | None: token on successful auth.
         """
-        response = self._backend.http_get(url=self.url)
+        response = self._backend.http_get(url=self._url)
         auth_headers = www_authenticate.parse(
             response.headers["WWW-Authenticate"]
         )
