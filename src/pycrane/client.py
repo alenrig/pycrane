@@ -6,7 +6,7 @@ import www_authenticate
 from requests.auth import AuthBase, HTTPBasicAuth
 
 from pycrane.backend import HTTPBackend
-from pycrane.utils import get_authfile_credentials, get_base_url
+from pycrane.utils import get_authfile_credentials, get_netloc
 
 
 class Pycrane:
@@ -28,7 +28,7 @@ class Pycrane:
 
     @property
     def _base_url(self) -> str:
-        return get_base_url(self.url)
+        return get_netloc(self.url)
 
     @property
     def _url(self) -> str:
