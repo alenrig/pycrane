@@ -4,8 +4,6 @@ import json
 from pathlib import Path
 from urllib.parse import urlparse
 
-from requests.auth import HTTPBasicAuth
-
 
 def get_netloc(url: str) -> str:
     """Get url network location.
@@ -21,7 +19,7 @@ def get_netloc(url: str) -> str:
     return urlparse(url).netloc
 
 
-def get_authfile_credentials(authfile: Path, base_url: str) -> HTTPBasicAuth:
+def get_authfile_credentials(authfile: Path, base_url: str) -> tuple[str, str]:
     """Get endpoint credentials from provided docker authfile.
 
     Args:
@@ -36,6 +34,7 @@ def get_authfile_credentials(authfile: Path, base_url: str) -> HTTPBasicAuth:
     endpoint_credentials = credentials.get(base_url, {})
     username = endpoint_credentials.get("username", "")
     password = endpoint_credentials.get("password", "")
+    # TODO: return only creds, auth in client
     if not any([username, password]):
         raise ValueError(f"Not found credentials for {base_url}")
-    return HTTPBasicAuth(username=username, password=password)
+    return username, password

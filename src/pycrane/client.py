@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import www_authenticate
-from requests.auth import AuthBase, HTTPBasicAuth
+from httpx import Auth, BasicAuth, Response
 
 from pycrane.backend import BearerAuth, HTTPBackend
 from pycrane.utils import get_authfile_credentials, get_netloc
@@ -34,7 +34,7 @@ class Pycrane:
         return f"{self._base_url}/v{self.api_version}"
 
     @property
-    def _auth(self) -> AuthBase:
+    def _auth(self) -> Auth:
         if not any([self.username, self.password, self.authfile]):
             raise ValueError("Specify auth method")
         if (self.username and not self.password) or (
@@ -46,10 +46,11 @@ class Pycrane:
                 "Only one of authfile or username should be defined"
             )
         if self.authfile:
-            return get_authfile_credentials(
+            username, password = get_authfile_credentials(
                 Path(self.authfile), self._base_url
             )
-        return HTTPBasicAuth(str(self.username), str(self.password))
+            return BasicAuth(username, password)
+        return BasicAuth(str(self.username), str(self.password))
 
     @property
     def _authenticator(self) -> HTTPBackend:
@@ -58,10 +59,10 @@ class Pycrane:
     @property
     def _backend(self) -> HTTPBackend:
         return HTTPBackend(
-            url=self._base_url, auth=BearerAuth(token=self._get_token())
+            url=self._base_url, auth=BearerAuth(token=self._request_token())
         )
 
-    def _get_token(self) -> str | None:
+    def _request_token(self) -> str:
         response = self._authenticator.http_get(url=self._url)
         auth_headers = www_authenticate.parse(
             response.headers["WWW-Authenticate"]
@@ -71,10 +72,13 @@ class Pycrane:
         service = bearer.get("service", "")
         auth_url = f"{realm}?service={service}&client_id=pycrane"
         response = self._authenticator.http_get(url=auth_url)
+        return self._get_token(response=response)
+
+    def _get_token(self, response: Response) -> str:
         content = response.json()
-        if isinstance(content, dict):
-            return content.get("token")
-        return None
+        if isinstance(content, dict) and content.get("token"):
+            return str(content.get("token"))
+        raise Exception("Can`t get auth token")
 
     def inspect(self, image: str) -> str:
         """Get image manifest.
