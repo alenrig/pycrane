@@ -1,31 +1,25 @@
 """HTTP Backend module for http calls."""
 
-from requests import Response, Session
-from requests.auth import AuthBase
+from httpx import Auth, Client, Response
 
 
-class BearerAuth(AuthBase):
+class BearerAuth(Auth):
     def __init__(self, token: str):
         self._token = token
 
-    def __call__(self, r):
-        r.headers["authorization"] = "Bearer " + self._token
-        return r
+    def auth_flow(self, request):
+        request.headers["authorization"] = "Bearer " + self._token
 
 
 class HTTPBackend:
     """Class for http calls."""
 
-    def __init__(self, url: str, auth: AuthBase | None = None) -> None:
+    def __init__(self, url: str, auth: Auth | None = None) -> None:
         self._url = url
         self._auth = auth
 
-    @property
-    def _session(self) -> Session:
-        session = Session()
-        if self._auth:
-            session.auth = self._auth
-        return session
+    def _client(self) -> Client:
+        return Client(auth=self._auth)
 
     def http_get(self, url: str) -> Response:
         """Make GET HTTP request.
@@ -36,7 +30,8 @@ class HTTPBackend:
         Returns:
             Response: result of request.
         """
-        return self._session.request(method="get", url=url)
+        with self._client() as client:
+            return client.get(url=url)
 
     def http_post(self, url: str) -> Response:
         """Make POST HTTP request.
@@ -47,4 +42,5 @@ class HTTPBackend:
         Returns:
             Response: result of request.
         """
-        return self._session.request(method="post", url=url)
+        with self._client() as client:
+            return client.post(url=url)
