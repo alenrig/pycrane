@@ -14,7 +14,7 @@ class Pycrane:
 
     def __init__(
         self,
-        url: str = "registry-1.docker.io",
+        url: str = "https://registry-1.docker.io",
         username: str | None = None,
         password: str | None = None,
         authfile: str | None = None,
@@ -31,7 +31,7 @@ class Pycrane:
 
     @property
     def _url(self) -> str:
-        return f"{self._base_url}/v{self.api_version}"
+        return f"{self.url}/v{self.api_version}"
 
     @property
     def _auth(self) -> Auth:
@@ -54,12 +54,12 @@ class Pycrane:
 
     @property
     def _authenticator(self) -> HTTPBackend:
-        return HTTPBackend(url=self._base_url, auth=self._auth)
+        return HTTPBackend(url=self.url, auth=self._auth)
 
     @property
     def _backend(self) -> HTTPBackend:
         return HTTPBackend(
-            url=self._base_url, auth=BearerAuth(token=self._request_token())
+            url=self.url, auth=BearerAuth(token=self._request_token())
         )
 
     def _request_token(self) -> str:
@@ -89,4 +89,8 @@ class Pycrane:
         Returns:
             str: image manifest if exists.
         """
-        return image
+        name, tag = image.split(":")
+        url = f"https://registry-1.docker.io/v2/{name}/manifests/{tag}"
+        response = self._backend.http_get(url=url)
+
+        return response
