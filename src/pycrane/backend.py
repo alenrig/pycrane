@@ -8,7 +8,8 @@ class BearerAuth(Auth):
         self._token = token
 
     def auth_flow(self, request):
-        request.headers["authorization"] = "Bearer " + self._token
+        request.headers["Authorization"] = f"Bearer {self._token}"
+        yield request
 
 
 class HTTPBackend:
@@ -18,6 +19,7 @@ class HTTPBackend:
         self._url = url
         self._auth = auth
 
+    @property
     def _client(self) -> Client:
         return Client(auth=self._auth)
 
@@ -30,17 +32,5 @@ class HTTPBackend:
         Returns:
             Response: result of request.
         """
-        with self._client() as client:
-            return client.get(url=url)
-
-    def http_post(self, url: str) -> Response:
-        """Make POST HTTP request.
-
-        Args:
-            url (str): path for request.
-
-        Returns:
-            Response: result of request.
-        """
-        with self._client() as client:
-            return client.post(url=url)
+        with self._client as client:
+            return client.get(url=url, follow_redirects=True)
